@@ -1,0 +1,16 @@
+{
+  "name": "mohon-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Developer portfolio of Md. Mohon — junior full-stack web developer from Bangladesh.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "16.4.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  }
+}
