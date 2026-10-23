@@ -264,10 +264,35 @@ p {
 .btn--primary {
   background: var(--accent);
   color: var(--accent-ink);
+  position: relative;
+  overflow: hidden;
 }
 
 .btn--primary:hover {
   background: var(--accent-strong);
+  box-shadow: 0 0 26px -6px rgba(168, 224, 99, 0.55);
+}
+
+/* Light sweep across the primary button on hover. */
+.btn--primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -65%;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  transform: skewX(-18deg);
+}
+
+.btn--primary:hover::after {
+  left: 125%;
+  transition: left 620ms var(--ease);
 }
 
 .btn--ghost {
@@ -675,6 +700,7 @@ p {
 
 .about__photo-wrap {
   position: relative;
+  perspective: 900px;
 }
 
 .about__photo {
@@ -685,14 +711,16 @@ p {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   filter: grayscale(100%);
-  transition: filter 320ms var(--ease);
+  transform-origin: center;
+  transition: filter 420ms var(--ease), transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .about__photo-wrap:hover .about__photo {
   filter: grayscale(0%);
+  transform: scale(1.03) rotateX(1.6deg);
 }
 
-/* Offset accent frame behind the photo */
+/* Offset accent frame behind the photo — settles in after the wipe reveal. */
 .about__photo-wrap::after {
   content: "";
   position: absolute;
@@ -700,6 +728,12 @@ p {
   z-index: -1;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
+  transform: translate(-10px, 10px);
+  transition: transform 800ms var(--ease) 300ms;
+}
+
+.about__photo-wrap.is-visible::after {
+  transform: none;
 }
 
 .about__body p {
@@ -969,36 +1003,67 @@ p {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   transition: border-color var(--dur) var(--ease),
-    transform var(--dur) var(--ease);
+    transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
 .process-step:hover {
   border-color: var(--border-strong);
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 38px -26px rgba(0, 0, 0, 0.9),
+    0 0 34px -18px rgba(168, 224, 99, 0.5);
 }
 
 .process-step__num {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid var(--border-strong);
   background: var(--bg-soft);
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  font-weight: 500;
   color: var(--accent);
   margin-bottom: 16px;
   transition: background-color var(--dur) var(--ease),
-    border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+    border-color var(--dur) var(--ease), color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.process-step__icon {
+  width: 19px;
+  height: 19px;
 }
 
 .process-step:hover .process-step__num {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--accent-ink);
+  box-shadow: 0 0 22px -4px rgba(168, 224, 99, 0.65);
+}
+
+/* Icon badges pop in one by one as the section reveals. */
+@keyframes badge-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.35) rotate(-14deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.process-step.is-visible .process-step__num {
+  animation: badge-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 220ms both;
+}
+
+.process-step__index {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
 }
 
 .process-step__title {
@@ -1154,6 +1219,543 @@ p {
   color: var(--text-muted);
 }
 
+/* ------------------------------- Animations ------------------------------- */
+
+/* Subtle slide-up reveal triggered when an element scrolls into view.
+   The delay per element is passed through the --reveal-delay property. */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 620ms var(--ease) var(--reveal-delay, 0ms),
+    transform 620ms var(--ease) var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Left-to-right wipe variant — pairs well with images.
+   The observed wrapper itself stays UNCLIPPED (some browsers count an
+   element's own clip-path toward its intersection rect, which would stop
+   the observer from ever firing); the wipe is applied to its children. */
+.reveal--mask > * {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 900ms cubic-bezier(0.65, 0, 0.35, 1)
+    var(--reveal-delay, 0ms);
+}
+
+.reveal--mask.is-visible > * {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Hero entrance on first paint: quick staggered rise, CSS-only.
+   Larger travel + expo easing so it actually reads on the dark theme. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(34px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-anim {
+  animation: rise-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--rise, 0ms);
+}
+
+/* Ambient glow orbs — blurred color washes that drift slowly behind the
+   hero. This is the layer that gives the dark theme visible life. */
+@keyframes glow-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-28px, 24px) scale(1.1);
+  }
+  66% {
+    transform: translate(20px, -18px) scale(0.94);
+  }
+}
+
+.hero__glow {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(64px);
+  pointer-events: none;
+  animation: glow-drift 20s ease-in-out infinite;
+}
+
+.hero__glow--a {
+  width: min(480px, 70vw);
+  aspect-ratio: 1;
+  top: 4%;
+  right: 2%;
+  background: radial-gradient(
+    circle,
+    rgba(168, 224, 99, 0.17),
+    transparent 70%
+  );
+}
+
+.hero__glow--b {
+  width: min(400px, 65vw);
+  aspect-ratio: 1;
+  bottom: -8%;
+  left: -6%;
+  background: radial-gradient(circle, rgba(97, 218, 251, 0.1), transparent 70%);
+  animation-duration: 27s;
+  animation-direction: reverse;
+}
+
+/* Lime halo breathing around the code window. */
+@keyframes halo-pulse {
+  0%,
+  100% {
+    box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.85),
+      0 0 70px -34px rgba(168, 224, 99, 0.35);
+  }
+  50% {
+    box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.85),
+      0 0 110px -24px rgba(168, 224, 99, 0.6);
+  }
+}
+
+.hero__code {
+  border-radius: var(--radius-lg);
+  animation: halo-pulse 6.5s ease-in-out 1.8s infinite;
+}
+
+/* Whole-page fade used as the route transition on every sub-page. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page {
+  animation: page-in 420ms var(--ease) both;
+}
+
+/* Pulsing availability dot */
+@keyframes status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(168, 224, 99, 0.04);
+  }
+}
+
+.hero__status-dot {
+  animation: status-pulse 2.4s var(--ease) infinite;
+}
+
+/* The hero grid backdrop drifts slowly — barely noticeable, adds life. */
+@keyframes grid-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 56px 56px, 56px 56px;
+  }
+}
+
+.hero__grid {
+  animation: grid-drift 26s linear infinite;
+}
+
+.hero__title-accent {
+  /* Solid yellow on purpose: the animated rotator words sit on their own
+     compositing layer, and background-clip:text across layers renders the
+     glyphs transparent (only the shadow showed = blurry cloud). A solid
+     color always paints crisply, so the "shine" comes from a pulsing
+     glow instead of a gradient sweep. */
+  color: #facc15;
+  animation: accent-glow 4.5s ease-in-out infinite;
+}
+
+@keyframes accent-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 22px rgba(250, 204, 21, 0.35);
+  }
+  50% {
+    text-shadow: 0 0 40px rgba(250, 204, 21, 0.7);
+  }
+}
+
+/* Headline word rotator: slide-up fade per phrase + blinking terminal caret. */
+.rotator {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.rotator__word {
+  display: inline-block;
+  animation: word-in 560ms var(--ease) both;
+}
+
+@keyframes word-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rotator__caret {
+  display: inline-block;
+  width: 3px;
+  height: 0.82em;
+  margin-left: 7px;
+  border-radius: 1px;
+  background: #facc15;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
+  vertical-align: baseline;
+  transform: translateY(0.08em);
+  animation: caret-blink 1.2s step-end 2.4s infinite;
+}
+
+@keyframes caret-blink {
+  0% {
+    opacity: 0;
+  }
+  1% {
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The code window keeps floating gently after its entrance. */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+.hero-anim--float {
+  animation: rise-in 640ms var(--ease) both var(--rise, 0ms),
+    float-soft 7.5s ease-in-out 1.45s infinite;
+}
+
+/* Window dots pop in, then each code line types itself into place. */
+@keyframes dot-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.code-window__dot {
+  animation: dot-pop 380ms var(--ease) both;
+}
+
+.code-window__dot:nth-child(1) {
+  animation-delay: 620ms;
+}
+.code-window__dot:nth-child(2) {
+  animation-delay: 720ms;
+}
+.code-window__dot:nth-child(3) {
+  animation-delay: 820ms;
+}
+
+@keyframes code-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.code-line {
+  opacity: 0;
+  animation: code-line-in 420ms var(--ease) forwards;
+}
+
+.code-line:nth-child(1) {
+  animation-delay: 1s;
+}
+.code-line:nth-child(2) {
+  animation-delay: 1.12s;
+}
+.code-line:nth-child(3) {
+  animation-delay: 1.24s;
+}
+.code-line:nth-child(4) {
+  animation-delay: 1.36s;
+}
+.code-line:nth-child(5) {
+  animation-delay: 1.48s;
+}
+.code-line:nth-child(6) {
+  animation-delay: 1.6s;
+}
+.code-line:nth-child(7) {
+  animation-delay: 1.72s;
+}
+.code-line:nth-child(8) {
+  animation-delay: 1.84s;
+}
+
+/* Caret appears once the last line has settled, then keeps blinking. */
+.code-line:last-child::after {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 1em;
+  margin-left: 5px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: caret-blink 1.2s step-end 2.3s infinite;
+}
+
+/* Pointer parallax wrapper — movement comes from --px / --py, written by JS. */
+.parallax {
+  transform: translate3d(var(--px, 0), var(--py, 0), 0);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* Download buttons nudge their icon downward instead of sideways.
+   Selector mirrors `.btn:hover svg` so it wins by source order. */
+.btn:hover svg.icon-down {
+  transform: translateY(3px);
+}
+
+.icon-down {
+  transition: transform var(--dur) var(--ease);
+}
+
+/* ------------------------------ Page header ------------------------------- */
+
+.page-head {
+  padding-top: calc(var(--nav-height) + clamp(52px, 8vw, 96px));
+  padding-bottom: clamp(32px, 5vw, 56px);
+  border-bottom: 1px solid var(--border);
+  background:
+    radial-gradient(
+      ellipse 70% 100% at 50% 0%,
+      rgba(168, 224, 99, 0.05),
+      transparent 70%
+    ),
+    var(--bg-soft);
+}
+
+.page-head__title {
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  letter-spacing: -0.03em;
+  margin-bottom: 16px;
+}
+
+.page-head__intro {
+  max-width: 640px;
+  color: var(--text-soft);
+  font-size: 1.0625rem;
+}
+
+.not-found .hero__actions {
+  margin-top: 30px;
+  margin-bottom: 0;
+}
+
+/* -------------------------------- Marquee --------------------------------- */
+
+.marquee {
+  overflow: hidden;
+  padding-block: 22px;
+  border-block: 1px solid var(--border);
+  background: var(--bg-soft);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.marquee--band {
+  border-top: none;
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 42s linear infinite;
+}
+
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee__group {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  padding-right: 34px;
+}
+
+.marquee__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color var(--dur) var(--ease);
+}
+
+.marquee__item:hover {
+  color: var(--text);
+}
+
+/* ------------------------------ Tech icons -------------------------------- */
+
+.tech-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--tech-color, var(--text-soft));
+  transition: color var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skill-tag:hover .tech-icon,
+.skill-tag:focus-visible .tech-icon {
+  color: var(--accent);
+  transform: rotate(-8deg) scale(1.15);
+}
+
+.skill-tag__icon {
+  width: 14px;
+  height: 14px;
+}
+
+/* --------------------------------- CTA band -------------------------------- */
+
+.cta-band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 26px;
+  padding: clamp(28px, 4vw, 42px) clamp(24px, 4vw, 42px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-band::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+}
+
+.cta-band__title {
+  font-size: clamp(1.3rem, 3vw, 1.7rem);
+  margin-bottom: 8px;
+}
+
+.cta-band__text {
+  color: var(--text-soft);
+  max-width: 480px;
+  font-size: 0.95rem;
+}
+
+.cta-band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-more {
+  margin-top: 34px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ------------------------------ Active nav link --------------------------- */
+
+.nav__link.is-active {
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.nav__mobile-link.is-active {
+  color: var(--accent);
+}
+
+.footer__link--cv {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--accent);
+}
+
+.footer__link--cv svg {
+  width: 15px;
+  height: 15px;
+}
+
+.nav__mobile-cv {
+  margin-top: 18px;
+  width: 100%;
+}
+
 /* ------------------------------ Accessibility ----------------------------- */
 
 .skip-link {
@@ -1246,6 +1848,19 @@ p {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .cta-band__actions {
+    width: 100%;
+  }
+
+  .cta-band__actions .btn {
+    flex: 1 1 auto;
+  }
+
+  .marquee__group {
+    gap: 24px;
+    padding-right: 24px;
+  }
 }
 
 @media (max-width: 560px) {
@@ -1309,5 +1924,28 @@ p {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Scroll-reveal elements would otherwise sit at their hidden start state. */
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal--mask > * {
+    clip-path: none;
+  }
+
+  .parallax {
+    transform: none;
+  }
+
+  .code-line {
+    opacity: 1;
+  }
+
+  .rotator__caret,
+  .code-line:last-child::after {
+    display: none;
   }
 }

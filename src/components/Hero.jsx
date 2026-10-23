@@ -1,40 +1,73 @@
+import Link from "next/link";
 import { siteConfig } from "@/data/site";
-import { GitHubIcon, LinkedInIcon, ArrowRightIcon } from "@/components/Icons";
+import WordRotator from "@/components/WordRotator";
+import ParallaxTilt from "@/components/ParallaxTilt";
+import {
+  GitHubIcon,
+  LinkedInIcon,
+  ArrowRightIcon,
+  FileDownIcon,
+} from "@/components/Icons";
+
+// Rotating phrases for the headline — all read grammatically after "That …".
+const headlinePhrases = [
+  "Solve Real Problems.",
+  "Delight Real Users.",
+  "Ship Fast & Clean.",
+  "Grow With You.",
+];
 
 export default function Hero() {
   return (
     <section className="hero" id="top" aria-labelledby="hero-title">
       <div className="hero__grid" aria-hidden="true" />
+      <div className="hero__glow hero__glow--a" aria-hidden="true" />
+      <div className="hero__glow hero__glow--b" aria-hidden="true" />
       <div className="container hero__layout">
         <div>
-          <p className="hero__status">
+          <p className="hero__status hero-anim" style={{ "--rise": "0ms" }}>
             <span className="hero__status-dot" aria-hidden="true" />
             Junior Full-Stack Developer · Bangladesh
           </p>
 
-          <h1 className="hero__title" id="hero-title">
+          <h1
+            className="hero__title hero-anim"
+            id="hero-title"
+            style={{ "--rise": "90ms" }}
+          >
             Building Digital Experiences That{" "}
-            <span className="hero__title-accent">Solve Real Problems.</span>
+            <span className="hero__title-accent">
+              <span className="visually-hidden">Solve Real Problems.</span>
+              <WordRotator words={headlinePhrases} />
+            </span>
           </h1>
 
-          <p className="hero__desc">
+          <p className="hero__desc hero-anim" style={{ "--rise": "180ms" }}>
             I&apos;m <strong>Md. Mohon</strong>, a junior full-stack developer
             focused on <strong>JavaScript</strong>, <strong>React</strong> and{" "}
             <strong>Next.js</strong>. I build responsive, practical web
             applications from the interface all the way to the database.
           </p>
 
-          <div className="hero__actions">
-            <a className="btn btn--primary" href="#projects">
+          <div className="hero__actions hero-anim" style={{ "--rise": "270ms" }}>
+            <Link className="btn btn--primary" href="/projects">
               Explore My Work
               <ArrowRightIcon />
+            </Link>
+            <a
+              className="btn btn--ghost"
+              href={siteConfig.resume}
+              download={siteConfig.resumeFileName}
+            >
+              <FileDownIcon className="icon-down" />
+              Download CV
             </a>
-            <a className="btn btn--ghost" href="#contact">
+            <Link className="btn btn--ghost" href="/contact">
               Contact Me
-            </a>
+            </Link>
           </div>
 
-          <div className="hero__socials">
+          <div className="hero__socials hero-anim" style={{ "--rise": "360ms" }}>
             <a
               className="hero__social"
               href={siteConfig.socials.github}
@@ -57,7 +90,11 @@ export default function Hero() {
         </div>
 
         {/* Code-inspired design element */}
-        <div className="code-window">
+        <ParallaxTilt className="hero__code" strength={12}>
+          <div
+            className="code-window hero-anim hero-anim--float"
+            style={{ "--rise": "450ms" }}
+          >
           <div className="code-window__bar">
             <span className="code-window__dot code-window__dot--accent" />
             <span className="code-window__dot" />
@@ -130,6 +167,7 @@ export default function Hero() {
             Open to internships, junior roles and freelance work
           </p>
         </div>
+      </ParallaxTilt>
       </div>
     </section>
   );

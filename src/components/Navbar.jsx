@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { siteConfig, navLinks } from "@/data/site";
 import {
   GitHubIcon,
@@ -12,6 +14,12 @@ import {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Close the drawer any time the route changes.
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   // Close the drawer with Escape and lock body scroll while it is open.
   useEffect(() => {
@@ -38,19 +46,26 @@ export default function Navbar() {
   }, []);
 
   const closeMenu = () => setOpen(false);
+  const isActive = (href) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <header className="nav">
       <div className="container nav__inner">
-        <a className="nav__brand" href="#top" onClick={closeMenu}>
+        <Link className="nav__brand" href="/" onClick={closeMenu}>
           MOHON<span className="nav__brand-dot">.DEV</span>
-        </a>
+        </Link>
 
         <nav className="nav__menu" aria-label="Primary">
           {navLinks.map((link) => (
-            <a key={link.href} className="nav__link" href={link.href}>
+            <Link
+              key={link.href}
+              className={`nav__link${isActive(link.href) ? " is-active" : ""}`}
+              href={link.href}
+              aria-current={isActive(link.href) ? "page" : undefined}
+            >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -73,17 +88,14 @@ export default function Navbar() {
             <LinkedInIcon />
             <span className="visually-hidden">LinkedIn profile</span>
           </a>
-          {siteConfig.resume ? (
-            <a
-              className="btn btn--ghost nav__resume-btn"
-              href={siteConfig.resume}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FileDownIcon />
-              Resume
-            </a>
-          ) : null}
+          <a
+            className="btn btn--ghost nav__resume-btn"
+            href={siteConfig.resume}
+            download={siteConfig.resumeFileName}
+          >
+            <FileDownIcon className="icon-down" />
+            Download CV
+          </a>
 
           <button
             type="button"
@@ -107,14 +119,17 @@ export default function Navbar() {
       >
         <nav aria-label="Mobile">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
-              className="nav__mobile-link"
+              className={`nav__mobile-link${
+                isActive(link.href) ? " is-active" : ""
+              }`}
               href={link.href}
               onClick={closeMenu}
+              aria-current={isActive(link.href) ? "page" : undefined}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="nav__mobile-socials">
@@ -137,6 +152,15 @@ export default function Navbar() {
             LinkedIn
           </a>
         </div>
+        <a
+          className="btn btn--primary nav__mobile-cv"
+          href={siteConfig.resume}
+          download={siteConfig.resumeFileName}
+          onClick={closeMenu}
+        >
+          <FileDownIcon className="icon-down" />
+          Download CV
+        </a>
       </div>
     </header>
   );

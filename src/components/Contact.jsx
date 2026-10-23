@@ -1,24 +1,33 @@
 import { siteConfig } from "@/data/site";
-import { MailIcon, GitHubIcon, LinkedInIcon, ArrowRightIcon } from "@/components/Icons";
+import {
+  MailIcon,
+  GitHubIcon,
+  LinkedInIcon,
+  ArrowRightIcon,
+  FileDownIcon,
+} from "@/components/Icons";
 
-export default function Contact() {
+export default function Contact({ withHeader = true }) {
   return (
     <section
       className="section section--alt contact"
       id="contact"
-      aria-labelledby="contact-title"
+      aria-labelledby={withHeader ? "contact-title" : undefined}
+      aria-label={withHeader ? undefined : "Contact"}
     >
       <div className="container">
-        <div className="section-head">
-          <span className="eyebrow">Contact</span>
-          <h2 className="section-title" id="contact-title">
-            Let&apos;s build something together.
-          </h2>
-          <p className="section-intro">
-            Have a role, an internship or an idea you&apos;d like a hand with?
-            The fastest way to reach me is email &mdash; I read every message.
-          </p>
-        </div>
+        {withHeader ? (
+          <div className="section-head">
+            <span className="eyebrow">Contact</span>
+            <h2 className="section-title" id="contact-title">
+              Let&apos;s build something together.
+            </h2>
+            <p className="section-intro">
+              Have a role, an internship or an idea you&apos;d like a hand with?
+              The fastest way to reach me is email &mdash; I read every message.
+            </p>
+          </div>
+        ) : null}
 
         <div className="contact__panel">
           <h3 className="contact__title">Get in touch</h3>
@@ -43,6 +52,14 @@ export default function Contact() {
             >
               Write to me
               <ArrowRightIcon />
+            </a>
+            <a
+              className="btn btn--ghost"
+              href={siteConfig.resume}
+              download={siteConfig.resumeFileName}
+            >
+              <FileDownIcon className="icon-down" />
+              Download CV
             </a>
             <a
               className="btn btn--ghost"

@@ -39,7 +39,25 @@ export const projects = [
     liveUrl: "https://cgpa-calculator-rw2j.vercel.app/",
     repoUrl: "https://github.com/mohonstack/CGPA-calculator",
   },
+
   {
+    id: "daily-bazar",
+    title: "Daily Bazar",
+    tagline: "Bengali daily market-price app",
+    description:
+      "Daily market prices in Bengali for rice, lentils, oil, vegetables, fish, meat, eggs and spices — with a live price ticker, per-item change indicators and market-wise average, minimum and maximum rates.",
+    image: "/assets/daily-bazar.png",
+    imageAlt: "Daily Bazar homepage showing today's market prices in Bengali",
+    tech: ["Next.js 16", "React 19", "Tailwind CSS v4", "DaisyUI", "HeroUI", "MongoDB", "Better Auth"],
+    features: [
+      "Category navigation with a live up / down price ticker",
+      "Market-wise detail with average, minimum and maximum rates",
+      "Sign in and sign up backed by Better Auth",
+    ],
+    liveUrl: "https://daily-bazar-dun.vercel.app/",
+    repoUrl: "https://github.com/mohonstack/Daily-Bazar",
+  },
+    {
     id: "bangla-news-24",
     title: "Bangla News 24",
     tagline: "Bengali-language news platform",
@@ -58,22 +76,5 @@ export const projects = [
     // the link here if the address changes.
     liveUrl: "https://bangla-news-gamma.vercel.app",
     repoUrl: "https://github.com/mohonstack/bangla_news",
-  },
-  {
-    id: "daily-bazar",
-    title: "Daily Bazar",
-    tagline: "Bengali daily market-price app",
-    description:
-      "Daily market prices in Bengali for rice, lentils, oil, vegetables, fish, meat, eggs and spices — with a live price ticker, per-item change indicators and market-wise average, minimum and maximum rates.",
-    image: "/assets/daily-bazar.png",
-    imageAlt: "Daily Bazar homepage showing today's market prices in Bengali",
-    tech: ["Next.js 16", "React 19", "Tailwind CSS v4", "DaisyUI", "HeroUI", "MongoDB", "Better Auth"],
-    features: [
-      "Category navigation with a live up / down price ticker",
-      "Market-wise detail with average, minimum and maximum rates",
-      "Sign in and sign up backed by Better Auth",
-    ],
-    liveUrl: "https://daily-bazar-dun.vercel.app/",
-    repoUrl: "https://github.com/mohonstack/Daily-Bazar",
   },
 ];

@@ -1,5 +1,7 @@
 import "./globals.css";
 import { siteConfig } from "@/data/site";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata = {
   metadataBase: new URL("https://mohonstack.github.io"),
@@ -45,7 +47,18 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <noscript>
+          {/* With JS off the IntersectionObserver never runs — show everything. */}
+          <style>{`.reveal { opacity: 1 !important; transform: none !important; } .reveal--mask > * { clip-path: none !important; } .code-line { opacity: 1 !important; }`}</style>
+        </noscript>
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <Navbar />
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }

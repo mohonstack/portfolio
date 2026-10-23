@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { siteConfig, navLinks } from "@/data/site";
-import { GitHubIcon, LinkedInIcon } from "@/components/Icons";
+import { GitHubIcon, LinkedInIcon, FileDownIcon } from "@/components/Icons";
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -8,16 +9,24 @@ export default function Footer() {
     <footer className="footer">
       <div className="container">
         <div className="footer__top">
-          <a className="footer__brand" href="#top">
+          <Link className="footer__brand" href="/">
             MOHON<span className="nav__brand-dot">.DEV</span>
-          </a>
+          </Link>
 
           <nav className="footer__menu" aria-label="Footer">
             {navLinks.map((link) => (
-              <a className="footer__link" href={link.href} key={link.href}>
+              <Link className="footer__link" href={link.href} key={link.href}>
                 {link.label}
-              </a>
+              </Link>
             ))}
+            <a
+              className="footer__link footer__link--cv"
+              href={siteConfig.resume}
+              download={siteConfig.resumeFileName}
+            >
+              <FileDownIcon className="icon-down" />
+              Download CV
+            </a>
           </nav>
 
           <div className="footer__socials">

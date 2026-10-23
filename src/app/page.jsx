@@ -1,28 +1,22 @@
-import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import TechMarquee from "@/components/TechMarquee";
 import About from "@/components/About";
 import Skills from "@/components/Skills";
 import Projects from "@/components/Projects";
 import Process from "@/components/Process";
 import Contact from "@/components/Contact";
-import Footer from "@/components/Footer";
+import { marqueeTech } from "@/data/site";
 
 export default function Home() {
   return (
-    <>
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
-      <Navbar />
-      <main id="main">
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Process />
-        <Contact />
-      </main>
-      <Footer />
-    </>
+    <main id="main" className="page">
+      <Hero />
+      <TechMarquee items={marqueeTech} className="marquee--band" />
+      <About />
+      <Skills />
+      <Projects limit={3} />
+      <Process />
+      <Contact />
+    </main>
   );
 }

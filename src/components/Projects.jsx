@@ -1,10 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import { projects } from "@/data/projects";
-import { ExternalLinkIcon, RepoIcon } from "@/components/Icons";
+import { ExternalLinkIcon, RepoIcon, ArrowRightIcon } from "@/components/Icons";
+import Reveal from "@/components/Reveal";
 
-function ProjectCard({ project }) {
+function ProjectCard({ project, delay = 0 }) {
   return (
-    <article className="project-card">
+    <Reveal as="article" className="project-card" delay={delay}>
       <div className="project-card__media">
         <Image
           className="project-card__img"
@@ -60,34 +62,48 @@ function ProjectCard({ project }) {
           ) : null}
         </div>
       </div>
-    </article>
+    </Reveal>
   );
 }
 
-export default function Projects() {
+export default function Projects({ limit, withHeader = true }) {
+  const visible = limit ? projects.slice(0, limit) : projects;
+
   return (
     <section
       className="section section--alt"
       id="projects"
-      aria-labelledby="projects-title"
+      aria-labelledby={withHeader ? "projects-title" : undefined}
+      aria-label={withHeader ? undefined : "Projects"}
     >
       <div className="container">
-        <div className="section-head">
-          <span className="eyebrow">Featured Projects</span>
-          <h2 className="section-title" id="projects-title">
-            Things I&apos;ve designed, built and shipped.
-          </h2>
-          <p className="section-intro">
-            Real, deployed applications &mdash; not tutorials. Every screenshot
-            below is the live product.
-          </p>
-        </div>
+        {withHeader ? (
+          <div className="section-head">
+            <span className="eyebrow">Featured Projects</span>
+            <h2 className="section-title" id="projects-title">
+              Things I&apos;ve designed, built and shipped.
+            </h2>
+            <p className="section-intro">
+              Real, deployed applications &mdash; not tutorials. Every screenshot
+              below is the live product.
+            </p>
+          </div>
+        ) : null}
 
         <div className="projects__grid">
-          {projects.map((project) => (
-            <ProjectCard project={project} key={project.id} />
+          {visible.map((project, i) => (
+            <ProjectCard project={project} key={project.id} delay={(i % 2) * 100} />
           ))}
         </div>
+
+        {limit && projects.length > limit ? (
+          <Reveal className="section-more">
+            <Link className="link-arrow" href="/projects">
+              View all {projects.length} projects
+              <ArrowRightIcon />
+            </Link>
+          </Reveal>
+        ) : null}
       </div>
     </section>
   );
